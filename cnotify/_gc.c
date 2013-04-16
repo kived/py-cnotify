@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*\
- * This file is part of Py-notify.                                    *
+ * This file is part of Py-cnotify.                                   *
  *                                                                    *
  * Copyright (C) 2007, 2008 Paul Pogonyshev.                          *
  *                                                                    *
@@ -244,7 +244,7 @@ static int          gc_module_clear                 (PyObject *self);
 
 /*- Documentation --------------------------------------------------*/
 
-#define MODULE_DOC "Internal helper module for C{L{notify.gc}}.  Do not use directly."
+#define MODULE_DOC "Internal helper module for C{L{cnotify.gc}}.  Do not use directly."
 
 
 #define FAST_GC_PROTECTOR_DOC "\
@@ -331,7 +331,7 @@ static PyGetSetDef  FastGCProtector_properties[]
 
 static PyTypeObject  FastGCProtector_Type
   = { Compatibility_VarObject_HEAD_INIT (0)
-      "notify._gc.FastGCProtector",                  /* tp_name           */
+      "cnotify._gc.FastGCProtector",                 /* tp_name           */
       sizeof (FastGCProtector),                      /* tp_basicsize      */
       0,                                             /* tp_itemsize       */
       (destructor)     FastGCProtector_dealloc,      /* tp_dealloc        */
@@ -393,7 +393,7 @@ static PyGetSetDef  RaisingGCProtector_properties[]
 
 static PyTypeObject  RaisingGCProtector_Type
   = { Compatibility_VarObject_HEAD_INIT (0)
-      "notify._gc.RaisingGCProtector",               /* tp_name           */
+      "cnotify._gc.RaisingGCProtector",              /* tp_name           */
       sizeof (RaisingGCProtector),                   /* tp_basicsize      */
       0,                                             /* tp_itemsize       */
       (destructor)     RaisingGCProtector_dealloc,   /* tp_dealloc        */
@@ -444,7 +444,7 @@ static PyMethodDef  DebugGCProtector_methods[]
 
 static PyTypeObject  DebugGCProtector_Type
   = { Compatibility_VarObject_HEAD_INIT (0)
-      "notify._gc.DebugGCProtector",                 /* tp_name           */
+      "cnotify._gc.DebugGCProtector",                /* tp_name           */
       sizeof (DebugGCProtector),                     /* tp_basicsize      */
       0,                                             /* tp_itemsize       */
       (destructor)     0,                            /* tp_dealloc        */
@@ -493,7 +493,7 @@ static PyTypeObject  DebugGCProtector_Type
 
 static Compatibility_ModuleDef  gc_module
   = { Compatibility_ModuleDef_HEAD_INIT,
-      "notify._gc",
+      "cnotify._gc",
       MODULE_DOC,
       sizeof (GCModuleState),
       NULL,
@@ -521,7 +521,7 @@ static char *  object_keywords[] = { "object", NULL };
 static int
 FastGCProtector_init (FastGCProtector *self, PyObject *arguments, PyObject *keywords)
 {
-  if (!PyArg_ParseTupleAndKeywords (arguments, keywords, ":notify._gc.FastGCProtector",
+  if (!PyArg_ParseTupleAndKeywords (arguments, keywords, ":cnotify._gc.FastGCProtector",
                                     no_keywords))
     return -1;
 
@@ -542,7 +542,7 @@ FastGCProtector_protect (FastGCProtector *self, PyObject *arguments, PyObject *k
   PyObject *object;
 
   if (!PyArg_ParseTupleAndKeywords (arguments, keywords,
-                                    "O:notify._gc.FastGCProtector.protect",
+                                    "O:cnotify._gc.FastGCProtector.protect",
                                     object_keywords, &object))
     return NULL;
 
@@ -563,7 +563,7 @@ FastGCProtector_unprotect (FastGCProtector *self, PyObject *arguments, PyObject 
   PyObject *object;
 
   if (!PyArg_ParseTupleAndKeywords (arguments, keywords,
-                                    "O:notify._gc.FastGCProtector.protect",
+                                    "O:cnotify._gc.FastGCProtector.protect",
                                     object_keywords, &object))
     return NULL;
 
@@ -590,7 +590,7 @@ FastGCProtector_get_num_active_protections (FastGCProtector *self)
 static int
 RaisingGCProtector_init (RaisingGCProtector *self, PyObject *arguments, PyObject *keywords)
 {
-  if (!PyArg_ParseTupleAndKeywords (arguments, keywords, ":notify._gc.RaisingGCProtector",
+  if (!PyArg_ParseTupleAndKeywords (arguments, keywords, ":cnotify._gc.RaisingGCProtector",
                                     no_keywords))
     return -1;
 
@@ -618,7 +618,7 @@ RaisingGCProtector_protect (RaisingGCProtector *self, PyObject *arguments, PyObj
   PyObject *object;
 
   if (!PyArg_ParseTupleAndKeywords (arguments, keywords,
-                                    "O:notify._gc.RaisingGCProtector.protect",
+                                    "O:cnotify._gc.RaisingGCProtector.protect",
                                     object_keywords, &object))
     return NULL;
 
@@ -668,7 +668,7 @@ RaisingGCProtector_unprotect (RaisingGCProtector *self, PyObject *arguments, PyO
   PyObject      *object;
 
   if (!PyArg_ParseTupleAndKeywords (arguments, keywords,
-                                    "O:notify._gc.RaisingGCProtector.unprotect",
+                                    "O:cnotify._gc.RaisingGCProtector.unprotect",
                                     object_keywords, &object))
     return NULL;
 
@@ -748,7 +748,7 @@ RaisingGCProtector_get_num_object_protections (RaisingGCProtector *self,
   PyObject *num_protections;
 
   if (!PyArg_ParseTupleAndKeywords (arguments, keywords,
-                                    "O:notify._gc.RaisingGCProtector.unprotect",
+                                    "O:cnotify._gc.RaisingGCProtector.unprotect",
                                     object_keywords, &object))
     return NULL;
 
@@ -794,7 +794,7 @@ DebugGCProtector_unprotect (DebugGCProtector *self, PyObject *arguments, PyObjec
    * fails, than it is because object is not protected, not because of wrong arguments.
    */
   if (!PyArg_ParseTupleAndKeywords (arguments, keywords,
-                                    "O:notify._gc.DebugGCProtector.unprotect",
+                                    "O:cnotify._gc.DebugGCProtector.unprotect",
                                     object_keywords, &object))
     return NULL;
 
@@ -821,7 +821,7 @@ gc_module_initialize_state (PyObject *self)
   PyObject      *main_module      = NULL;
   PyObject      *main_module_dict = NULL;
 
-  main_module = PyImport_ImportModule ("notify.gc");
+  main_module = PyImport_ImportModule ("cnotify.gc");
   if (!main_module)
     goto error;
 
