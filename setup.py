@@ -1,16 +1,16 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This file is part of Py-notify.
+# This file is part of Py-cnotify.
 #
-# Unlike the rest of Py-notify, it is explicitely put in Public Domain.  Use as you
+# Unlike the rest of Py-cnotify, it is explicitely put in Public Domain.  Use as you
 # please.
 
 
 # In particular, we heavily use True and False, there are uses of enumerate(), file coding
 # is explicitly set etc.
 
-REQUIRED_PYTHON_VERSION = (2, 3)
+REQUIRED_PYTHON_VERSION = (2, 6)
 
 
 
@@ -196,19 +196,19 @@ class build_ext (_build_ext):
 # 2.3 will be baffled by function decorators already, 2.4 --- by `yield' inside `try
 # ... finally'.
 
-import __future__
-
-def should_be_byte_compiled (filename):
-    package_name = os.path.basename (os.path.split (filename) [0])
-    return package_name != '_2_5' or 'with_statement' in __future__.all_feature_names
-
-def custom_byte_compile (filenames, *arguments, **keywords):
-    original_byte_compile ([filename for filename in filenames
-                            if should_be_byte_compiled (filename)],
-                           *arguments, **keywords)
-
-original_byte_compile       = distutils.util.byte_compile
-distutils.util.byte_compile = custom_byte_compile
+#import __future__
+#
+#def should_be_byte_compiled (filename):
+#    package_name = os.path.basename (os.path.split (filename) [0])
+#    return package_name != '_2_5' or 'with_statement' in __future__.all_feature_names
+#
+#def custom_byte_compile (filenames, *arguments, **keywords):
+#    original_byte_compile ([filename for filename in filenames
+#                            if should_be_byte_compiled (filename)],
+#                           *arguments, **keywords)
+#
+#original_byte_compile       = distutils.util.byte_compile
+#distutils.util.byte_compile = custom_byte_compile
 
 
 
@@ -227,17 +227,17 @@ cython_extensions = [
 	Extension(name='notify.variable', sources=[path('variable.pyx')])
 ]
 
-setup (name             = 'py-notify',
+setup (name             = 'py-cnotify',
        version          = version,
        description      = 'An unorthodox implementation of Observer programming pattern.',
        long_description = long_description,
-       author           = 'Paul Pogonyshev',
-       author_email     = 'py-notify-dev@gna.org',
-       url              = 'http://home.gna.org/py-notify/',
-       download_url     = 'http://download.gna.org/py-notify/',
-       license          = "GNU Lesser General Public License v2.1",
+       author           = 'Ryan Pessa',
+       author_email     = 'ryan@essential-elements.net',
+       url              = 'http://github.com/kived/py-cnotify/',
+       download_url     = 'http://github.com/kived/py-cnotify/',
+       license          = "GNU Lesser General Public License v3",
        classifiers      = classifiers,
-       packages         = ['notify', 'notify._2_5'],
+       packages         = ['notify'],
        ext_modules      = [gc_extension] + cython_extensions,
        cmdclass         = { 'build_ext': build_ext })
 
