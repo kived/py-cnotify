@@ -29,9 +29,9 @@ if sys.version_info[:3] < REQUIRED_PYTHON_VERSION:
 if os.path.dirname (sys.argv[0]):
     os.chdir (os.path.dirname (sys.argv[0]))
 
-if not os.path.isfile (os.path.join ('notify', 'all.py')):
+if not os.path.isfile (os.path.join ('cnotify', 'all.py')):
     sys.exit ("%s: cannot find '%s', strange..."
-              % (sys.argv[0], os.path.join ('notify', 'all.py')))
+              % (sys.argv[0], os.path.join ('cnotify', 'all.py')))
 
 
 
@@ -62,7 +62,7 @@ def configure (version):
         output_file_out = None
 
         try:
-            template_file    = open (os.path.join ('notify', '__init__.py.in'))
+            template_file    = open (os.path.join ('cnotify', '__init__.py.in'))
             result_line_list = []
             in_configuration = False
 
@@ -81,7 +81,7 @@ def configure (version):
             if template_file is not None:
                 template_file.close ()
 
-        output_file_name = os.path.join ('notify', '__init__.py')
+        output_file_name = os.path.join ('cnotify', '__init__.py')
 
         try:
             try:
@@ -212,19 +212,19 @@ class build_ext (_build_ext):
 
 
 
-gc_extension = Extension (name    = 'notify._gc',
-                          sources = [os.path.join ('notify', '_gc.c')])
+gc_extension = Extension (name    = 'cnotify._gc',
+                          sources = [os.path.join ('cnotify', '_gc.c')])
 
 from functools import partial
-path = partial(os.path.join, 'notify')
+path = partial(os.path.join, 'cnotify')
 cython_extensions = [
-	Extension(name='notify.signal', sources=[path('signal.pyx')]),
-	Extension(name='notify.base', sources=[path('base.pyx')]),
-	Extension(name='notify.bind', sources=[path('bind.pyx')]),
-	Extension(name='notify.condition', sources=[path('condition.pyx')]),
-	Extension(name='notify.mediator', sources=[path('mediator.pyx')]),
-	Extension(name='notify.utils', sources=[path('utils.pyx')]),
-	Extension(name='notify.variable', sources=[path('variable.pyx')])
+	Extension(name='cnotify.signal', sources=[path('signal.pyx')]),
+	Extension(name='cnotify.base', sources=[path('base.pyx')]),
+	Extension(name='cnotify.bind', sources=[path('bind.pyx')]),
+	Extension(name='cnotify.condition', sources=[path('condition.pyx')]),
+	Extension(name='cnotify.mediator', sources=[path('mediator.pyx')]),
+	Extension(name='cnotify.utils', sources=[path('utils.pyx')]),
+	Extension(name='cnotify.variable', sources=[path('variable.pyx')])
 ]
 
 setup (name             = 'py-cnotify',
@@ -237,7 +237,7 @@ setup (name             = 'py-cnotify',
        download_url     = 'http://github.com/kived/py-cnotify/',
        license          = "GNU Lesser General Public License v3",
        classifiers      = classifiers,
-       packages         = ['notify'],
+       packages         = ['cnotify'],
        ext_modules      = [gc_extension] + cython_extensions,
        cmdclass         = { 'build_ext': build_ext })
 

@@ -4,9 +4,8 @@ Priority: optional
 Maintainer: Ryan Pessa <ryan@essential-elements.net>
 Uploaders: AerisPOS Team <aerispos@googlegroups.com>
 Build-Depends: debhelper (>= 7.0.50~),
-               cdbs,
+               cdbs (>=0.4.90~),
                python2.7 (>= 2.7),
-               python-support (>= 0.90),
                python-all-dev | python-dev, python2.7-dev (>= 2.7),
                cython
 Standards-Version: 3.9.4.0
