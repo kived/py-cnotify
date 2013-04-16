@@ -33,14 +33,14 @@ Whether to use this feature is up to you.
 __docformat__ = 'epytext en'
 
 
-from notify.base      import *
-from notify.bind      import *
-from notify.condition import *
-from notify.gc        import *
-from notify.mediator  import *
-from notify.signal    import *
-from notify.utils     import *
-from notify.variable  import *
+from cnotify.base      import *
+from cnotify.bind      import *
+from cnotify.condition import *
+from cnotify.gc        import *
+from cnotify.mediator  import *
+from cnotify.signal    import *
+from cnotify.utils     import *
+from cnotify.variable  import *
 
 
 

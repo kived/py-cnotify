@@ -70,7 +70,7 @@ import sys
 from types        import FunctionType, MethodType
 import weakref
 
-from notify.utils import is_callable, frozendict, DummyReference
+from cnotify.utils import is_callable, frozendict, DummyReference
 
 
 

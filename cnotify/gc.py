@@ -47,7 +47,7 @@ __all__       = ('GCProtectorMeta', 'AbstractGCProtector', 'StandardGCProtector'
                  'FastGCProtector', 'RaisingGCProtector', 'DebugGCProtector')
 
 
-from notify.utils import _PYTHON_IMPLEMENTATION, raise_not_implemented_exception
+from cnotify.utils import _PYTHON_IMPLEMENTATION, raise_not_implemented_exception
 
 
 

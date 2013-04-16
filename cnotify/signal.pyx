@@ -108,9 +108,9 @@ __all__       = ('AbstractSignal', 'Signal', 'CleanSignal')
 import sys
 import weakref
 
-from notify.bind  import Binding, WeakBinding
-from notify.gc    import AbstractGCProtector
-from notify.utils import is_callable, raise_not_implemented_exception, DummyReference
+from cnotify.bind  import Binding, WeakBinding
+from cnotify.gc    import AbstractGCProtector
+from cnotify.utils import is_callable, raise_not_implemented_exception, DummyReference
 
 try:
     import contextlib

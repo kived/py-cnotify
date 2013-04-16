@@ -56,7 +56,7 @@ __docformat__ = 'epytext en'
 __all__       = ('AbstractMediator', 'BooleanMediator', 'FunctionalMediator')
 
 
-from notify.utils import is_callable, raise_not_implemented_exception
+from cnotify.utils import is_callable, raise_not_implemented_exception
 
 
 

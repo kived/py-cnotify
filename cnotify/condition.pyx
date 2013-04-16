@@ -37,12 +37,12 @@ __all__       = ('AbstractCondition', 'AbstractStateTrackingCondition',
 import sys
 import weakref
 
-#from notify.base   import AbstractValueObject
-from notify.base cimport AbstractValueObject
-from notify.gc     import AbstractGCProtector
-#from notify.signal import CleanSignal
-from notify.signal cimport CleanSignal
-from notify.utils  import execute, is_callable, raise_not_implemented_exception, DummyReference
+#from  cnotify.base   import AbstractValueObject
+from cnotify.base cimport AbstractValueObject
+from cnotify.gc     import AbstractGCProtector
+#from  cnotify.signal import CleanSignal
+from cnotify.signal cimport CleanSignal
+from cnotify.utils  import execute, is_callable, raise_not_implemented_exception, DummyReference
 
 
 

@@ -8,7 +8,7 @@ include /usr/share/cdbs/1/class/python-distutils.mk
 DEB_DESTDIR = $(CURDIR)/debian/tmp
 
 clean::
-	rm cnotify/*.so
-	rm cnotify/*.pyc cnotify/*.pyo
-	find cnotify -name '*.pyx' -exec sh -c 'echo `dirname {}`/`basename {} .pyx`.c' \; | xargs rm
+	rm cnotify/*.so || :
+	rm cnotify/*.pyc cnotify/*.pyo || :
+	find cnotify -name '*.pyx' -exec sh -c 'echo `dirname {}`/`basename {} .pyx`.c' \; | xargs rm || :
 	dh_clean

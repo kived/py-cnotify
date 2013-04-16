@@ -1,5 +1,5 @@
 
-from notify.signal cimport Signal
+from cnotify.signal cimport Signal
 
 cdef class AbstractValueObject(object):
 	cdef __weakref__

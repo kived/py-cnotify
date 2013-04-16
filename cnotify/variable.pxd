@@ -1,6 +1,6 @@
 
-from notify.base cimport AbstractValueObject
-from notify.condition cimport AbstractCondition
+from cnotify.base cimport AbstractValueObject
+from cnotify.condition cimport AbstractCondition
 
 cdef class AbstractVariable(AbstractValueObject):
 	cpdef AbstractCondition predicate(self, object predicate)

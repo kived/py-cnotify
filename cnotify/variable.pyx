@@ -37,13 +37,13 @@ __all__       = ('AbstractVariable', 'AbstractValueTrackingVariable',
 import types
 import weakref
 
-#from notify.base      import AbstractValueObject
-from notify.base cimport AbstractValueObject
-from notify.condition import AbstractStateTrackingCondition
-from notify.condition cimport AbstractCondition
-from notify.gc        import AbstractGCProtector
-from notify.signal    import CleanSignal
-from notify.utils     import execute, is_callable, ClassTypes
+#from  cnotify.base      import AbstractValueObject
+from cnotify.base cimport AbstractValueObject
+from cnotify.condition import AbstractStateTrackingCondition
+from cnotify.condition cimport AbstractCondition
+from cnotify.gc        import AbstractGCProtector
+from cnotify.signal    import CleanSignal
+from cnotify.utils     import execute, is_callable, ClassTypes
 
 
 

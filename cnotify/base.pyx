@@ -34,10 +34,10 @@ __all__       = ('AbstractValueObject',)
 
 import sys
 
-from notify.mediator import AbstractMediator
-#from notify.signal   import AbstractSignal, Signal
-from notify.signal cimport AbstractSignal, Signal
-from notify.utils    import execute, is_callable, is_valid_identifier, mangle_identifier, \
+from cnotify.mediator import AbstractMediator
+#from  cnotify.signal   import AbstractSignal, Signal
+from cnotify.signal cimport AbstractSignal, Signal
+from cnotify.utils    import execute, is_callable, is_valid_identifier, mangle_identifier, \
                             raise_not_implemented_exception, StringType
  
 try:
