@@ -1,0 +1,23 @@
+Source: py-cnotify
+Section: python
+Priority: optional
+Maintainer: Ryan Pessa <ryan@essential-elements.net>
+Uploaders: AerisPOS Team <aerispos@googlegroups.com>
+Build-Depends: debhelper (>= 7.0.50~),
+               cdbs,
+               python2.7 (>= 2.7),
+               python-support (>= 0.90),
+               python-all-dev | python-dev, python2.7-dev (>= 2.7),
+               cython
+Standards-Version: 3.9.4.0
+Homepage: http://github.com/kived/py-cnotify
+
+Package: python-cnotify
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         ${python:Depends}
+Description: Python event handling system
+ py-cnotify is a Cythoned version of py-notify, a Python event
+ handling system.
+
