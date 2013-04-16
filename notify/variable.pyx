@@ -37,8 +37,10 @@ __all__       = ('AbstractVariable', 'AbstractValueTrackingVariable',
 import types
 import weakref
 
-from notify.base      import AbstractValueObject
+#from notify.base      import AbstractValueObject
+from notify.base cimport AbstractValueObject
 from notify.condition import AbstractStateTrackingCondition
+from notify.condition cimport AbstractCondition
 from notify.gc        import AbstractGCProtector
 from notify.signal    import CleanSignal
 from notify.utils     import execute, is_callable, ClassTypes
@@ -47,7 +49,7 @@ from notify.utils     import execute, is_callable, ClassTypes
 
 #-- Base variable classes --------------------------------------------
 
-class AbstractVariable (AbstractValueObject):
+cdef class AbstractVariable (AbstractValueObject):
 
     """
     Abstract base class of variable hierarchy tree.  All variable derive from this class,
@@ -57,18 +59,18 @@ class AbstractVariable (AbstractValueObject):
 
     __slots__ = ()
 
+    property value:
+        """
+        The current value of the variable.  This property is
+        writable, but setting it for immutable variables will raise
+        C{NotImplementedError}.
 
-    value = property (lambda self: self.get (), lambda self, value: self.set (value),
-                      doc = ("""
-                             The current value of the variable.  This property is
-                             writable, but setting it for immutable variables will raise
-                             C{NotImplementedError}.
+        @type: object
+        """
+        def __get__(self): return self.get()
+        def __set__(self, value): self.set(value)
 
-                             @type: object
-                             """))
-
-
-    def predicate (self, predicate):
+    cpdef AbstractCondition predicate (self, object predicate):
         """
         Construct a condition, whose state is always given C{predicate} over this variable
         value.
@@ -113,7 +115,7 @@ class AbstractVariable (AbstractValueObject):
 
 
 
-class AbstractValueTrackingVariable (AbstractVariable):
+cdef class AbstractValueTrackingVariable (AbstractVariable):
 
     """
     A variable that stores its value instead of recomputing it each time.  Since there is
@@ -143,7 +145,7 @@ class AbstractValueTrackingVariable (AbstractVariable):
         self.__value = initial_value
 
 
-    def get (self):
+    cpdef object get (self):
         """
         Get the current value of the variable.  Since this variable type stores its value,
         this is the last object as passed to C{L{_set}} method internally.
@@ -153,7 +155,7 @@ class AbstractValueTrackingVariable (AbstractVariable):
 
         return self.__value
 
-    def _set (self, value):
+    cpdef int _set (self, object value):
         """
         Set the value of the variable internally.  The C{value} is checked for both
         equality with the current value and whether it passes C{L{is_allowed_value}} test.
@@ -322,7 +324,7 @@ class AbstractValueTrackingVariable (AbstractVariable):
 
 #-- Standard non-abstract variables ----------------------------------
 
-class Variable (AbstractValueTrackingVariable):
+cdef class Variable (AbstractValueTrackingVariable):
 
     """
     Standard implementation of a mutable variable.  It is an all-purpose class suitable
@@ -336,7 +338,7 @@ class Variable (AbstractValueTrackingVariable):
     __slots__ = ()
 
 
-    def set (self, value):
+    cpdef int set (self, object value):
         """
         Set the current value for the variable.  As a result, ‘changed’ signal will be
         emitted, but only if the new value is not equal to the old one.  For derived types

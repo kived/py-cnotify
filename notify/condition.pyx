@@ -37,16 +37,21 @@ __all__       = ('AbstractCondition', 'AbstractStateTrackingCondition',
 import sys
 import weakref
 
-from notify.base   import AbstractValueObject
+#from notify.base   import AbstractValueObject
+from notify.base cimport AbstractValueObject
 from notify.gc     import AbstractGCProtector
-from notify.signal import CleanSignal
+#from notify.signal import CleanSignal
+from notify.signal cimport CleanSignal
 from notify.utils  import execute, is_callable, raise_not_implemented_exception, DummyReference
 
 
 
 #-- Base condition class ---------------------------------------------
 
-class AbstractCondition (AbstractValueObject):
+_AC_TRUE = None
+_AC_FALSE = None
+
+cdef class AbstractCondition (AbstractValueObject):
 
     """
     Abstract base class of condition hierarchy tree.  All conditions derive from this
@@ -62,7 +67,11 @@ class AbstractCondition (AbstractValueObject):
 
     __slots__ = ()
 
-
+    property TRUE:
+        def __get__(self): return _AC_TRUE
+    property FALSE:
+        def __get__(self): return _AC_FALSE
+	
     # We won't use it internally for marginal optimization.
     state = property (lambda self: self.get (), lambda self, state: self.set (state),
                       doc = ("""
@@ -770,9 +779,10 @@ class _False (AbstractCondition):
 
 
 
-AbstractCondition.TRUE  = _True ()
-AbstractCondition.FALSE = _False ()
-
+#AbstractCondition.TRUE  = _True ()
+#AbstractCondition.FALSE = _False ()
+_AC_TRUE = _True()
+_AC_FALSE = _False()
 
 
 # Previously derived from `AbstractStateTrackingCondition', but this is a tiny little bit

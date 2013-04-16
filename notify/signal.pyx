@@ -122,7 +122,166 @@ except ImportError:
 
 #-- Signal interface classes -----------------------------------------
 
-class AbstractSignal (object):
+cdef class _AbstractAccumulator (object):
+
+    """
+    An accumulator of signal handlers results.  It may combine, alter or discard
+    values, post-process values after all handlers run (or emission stops for some
+    reason) or stop emission based on the values.
+
+    Note that accumulator must I{not} contain the accumulated value or have any
+    internal state (except that specified by C{__init__} arguments) whatsoever.  This
+    no-OOP design is required to make accumulators thread- and reentrance-safe, so
+    that the same accumulator can be used from multiple threads or nested signal
+    emissions.  Any state must be stored in external variable C{accumulated_value},
+    which is passed to all appropriate functions.
+    """
+
+    __slots__ = ()
+
+
+    def get_initial_value (self):
+        """
+        Get initial value for this accumulator.  This value will be passed to the
+        first invocation of C{L{accumulate_value}} method.  Default implementation
+        returns C{None}.
+
+        @rtype: C{object}
+        """
+
+        return None
+
+    def accumulate_value (self, accumulated_value, value_to_add):
+        """
+        Accumulate C{value_to_add} into C{accumulated_value} and return the result.
+        Result will be passed to next invocation of this method, if any.
+
+        @param accumulated_value: value, returned from the last call to
+                                  C{accumulated_value} or C{L{get_initial_value}}.
+        @param value_to_add:      next handler value, to be added to
+                                  C{accumulated_value}.
+
+        @rtype:                   C{object}
+        @returns:                 New accumulated value, combination of
+                                  C{accumulated_value} and C{value_to_add}.
+        """
+
+        raise_not_implemented_exception (self)
+
+    def should_continue (self, accumulated_value):
+        """
+        Examine C{accumulated_value} and decide if signal emission should continue.
+        Default implementation always returns C{True}.
+
+        @param accumulated_value: value, returned from the last call to
+                                  C{accumulated_value}.
+
+        @rtype:                   C{bool}
+        @returns:                 Whether signal emission should continue.
+        """
+
+        return True
+
+    def post_process_value (self, accumulated_value):
+        """
+        Post-process C{accumulated_value} and return new value.  This method is called
+        after signal emission ends, either because there are no more handlers or it
+        was stopped by C{L{should_continue}} or from outside, using
+        C{L{AbstractSignal.stop_emission}} method.  Default implementation does
+        nothing and returns C{accumulated_value} unchanged.
+
+        @param accumulated_value: value, returned from the last call to
+                                  C{accumulated_value} or C{L{get_initial_value}}.
+
+        @rtype:                   C{object}
+        @returns:                 Final accumulated value, either C{accumulated_value}
+                                  or some transformation of it.
+        """
+
+        return accumulated_value
+
+
+cdef class _AnyAcceptsAccumulator (_AbstractAccumulator):
+
+    """
+    An accumulator that stops emission if any handler returns a non-zero value and
+    sets emission result to it in this case.  If all handlers return zero values,
+    signal emission is not stopped and result is returned by last handler.  If there
+    are no handlers at all, emission result is C{False}.
+
+    @note: Whether a value is non-zero is determined as by built-in C{bool} function.
+    """
+
+    __slots__ = ()
+
+
+    def get_initial_value (self):
+        return False
+
+    def accumulate_value (self, accumulated_value, value_to_add):
+        return value_to_add
+
+    def should_continue (self, accumulated_value):
+        return not accumulated_value
+
+
+cdef class _AllAcceptAccumulator (_AbstractAccumulator):
+
+    """
+    An accumulator that stops emission if any handler returns a zero value and sets
+    emission result to it in this case.  If all handlers return non-zero values,
+    signal emission is not stopped and result is returned by last handler.  If there
+    are no handlers at all, emission result is C{True}.
+
+    @note: Whether a value is non-zero is determined as by built-in C{bool} function.
+    """
+
+    __slots__ = ()
+
+
+    def get_initial_value (self):
+        return True
+
+    def accumulate_value (self, accumulated_value, value_to_add):
+        return value_to_add
+
+    def should_continue (self, accumulated_value):
+        return accumulated_value
+
+
+cdef class _LastValueAccumulator (_AbstractAccumulator):
+
+    """
+    An accumulator that always returns the value returned by last handler.  If there
+    are no handlers at all, emission result is C{None}.
+    """
+
+    __slots__ = ()
+
+
+    def accumulate_value (self, accumulated_value, value_to_add):
+        return value_to_add
+
+
+cdef class _ValueListAccumulator (_AbstractAccumulator):
+
+    """
+    An accumulator that returns a list of all handler results.  If there are no
+    handlers at all, emission result is an empty list.
+    """
+
+    __slots__ = ()
+
+
+    def get_initial_value (self):
+        return []
+
+    def accumulate_value (self, accumulated_value, value_to_add):
+        accumulated_value.append (value_to_add)
+        return accumulated_value
+
+
+cdef class AbstractSignal (object):
 
     """
     Abstract interface all signal classes must implement.
@@ -154,169 +313,16 @@ class AbstractSignal (object):
     has_handlers, __nonzero__, count_handlers, collect_garbage,
     _wrap_handler, _additional_description
     """
-
+    
     __slots__ = ()
 
-
-    class AbstractAccumulator (object):
-
-        """
-        An accumulator of signal handlers results.  It may combine, alter or discard
-        values, post-process values after all handlers run (or emission stops for some
-        reason) or stop emission based on the values.
-
-        Note that accumulator must I{not} contain the accumulated value or have any
-        internal state (except that specified by C{__init__} arguments) whatsoever.  This
-        no-OOP design is required to make accumulators thread- and reentrance-safe, so
-        that the same accumulator can be used from multiple threads or nested signal
-        emissions.  Any state must be stored in external variable C{accumulated_value},
-        which is passed to all appropriate functions.
-        """
-
-        __slots__ = ()
-
-
-        def get_initial_value (self):
-            """
-            Get initial value for this accumulator.  This value will be passed to the
-            first invocation of C{L{accumulate_value}} method.  Default implementation
-            returns C{None}.
-
-            @rtype: C{object}
-            """
-
-            return None
-
-        def accumulate_value (self, accumulated_value, value_to_add):
-            """
-            Accumulate C{value_to_add} into C{accumulated_value} and return the result.
-            Result will be passed to next invocation of this method, if any.
-
-            @param accumulated_value: value, returned from the last call to
-                                      C{accumulated_value} or C{L{get_initial_value}}.
-            @param value_to_add:      next handler value, to be added to
-                                      C{accumulated_value}.
-
-            @rtype:                   C{object}
-            @returns:                 New accumulated value, combination of
-                                      C{accumulated_value} and C{value_to_add}.
-            """
-
-            raise_not_implemented_exception (self)
-
-        def should_continue (self, accumulated_value):
-            """
-            Examine C{accumulated_value} and decide if signal emission should continue.
-            Default implementation always returns C{True}.
-
-            @param accumulated_value: value, returned from the last call to
-                                      C{accumulated_value}.
-
-            @rtype:                   C{bool}
-            @returns:                 Whether signal emission should continue.
-            """
-
-            return True
-
-        def post_process_value (self, accumulated_value):
-            """
-            Post-process C{accumulated_value} and return new value.  This method is called
-            after signal emission ends, either because there are no more handlers or it
-            was stopped by C{L{should_continue}} or from outside, using
-            C{L{AbstractSignal.stop_emission}} method.  Default implementation does
-            nothing and returns C{accumulated_value} unchanged.
-
-            @param accumulated_value: value, returned from the last call to
-                                      C{accumulated_value} or C{L{get_initial_value}}.
-
-            @rtype:                   C{object}
-            @returns:                 Final accumulated value, either C{accumulated_value}
-                                      or some transformation of it.
-            """
-
-            return accumulated_value
-
-
-    class AnyAcceptsAccumulator (AbstractAccumulator):
-
-        """
-        An accumulator that stops emission if any handler returns a non-zero value and
-        sets emission result to it in this case.  If all handlers return zero values,
-        signal emission is not stopped and result is returned by last handler.  If there
-        are no handlers at all, emission result is C{False}.
-
-        @note: Whether a value is non-zero is determined as by built-in C{bool} function.
-        """
-
-        __slots__ = ()
-
-
-        def get_initial_value (self):
-            return False
-
-        def accumulate_value (self, accumulated_value, value_to_add):
-            return value_to_add
-
-        def should_continue (self, accumulated_value):
-            return not accumulated_value
-
-
-    class AllAcceptAccumulator (AbstractAccumulator):
-
-        """
-        An accumulator that stops emission if any handler returns a zero value and sets
-        emission result to it in this case.  If all handlers return non-zero values,
-        signal emission is not stopped and result is returned by last handler.  If there
-        are no handlers at all, emission result is C{True}.
-
-        @note: Whether a value is non-zero is determined as by built-in C{bool} function.
-        """
-
-        __slots__ = ()
-
-
-        def get_initial_value (self):
-            return True
-
-        def accumulate_value (self, accumulated_value, value_to_add):
-            return value_to_add
-
-        def should_continue (self, accumulated_value):
-            return accumulated_value
-
-
-    class LastValueAccumulator (AbstractAccumulator):
-
-        """
-        An accumulator that always returns the value returned by last handler.  If there
-        are no handlers at all, emission result is C{None}.
-        """
-
-        __slots__ = ()
-
-
-        def accumulate_value (self, accumulated_value, value_to_add):
-            return value_to_add
-
-
-    class ValueListAccumulator (AbstractAccumulator):
-
-        """
-        An accumulator that returns a list of all handler results.  If there are no
-        handlers at all, emission result is an empty list.
-        """
-
-        __slots__ = ()
-
-
-        def get_initial_value (self):
-            return []
-
-        def accumulate_value (self, accumulated_value, value_to_add):
-            accumulated_value.append (value_to_add)
-            return accumulated_value
-
-
+    # cython fix
+    AbstractAccumulator = _AbstractAccumulator
+    AnyAcceptsAccumulator = _AnyAcceptsAccumulator
+    AllAcceptAccumulator = _AllAcceptAccumulator
+    LastValueAccumulator = _LastValueAccumulator
+    ValueListAccumulator = _ValueListAccumulator
+    
     ANY_ACCEPTS = AnyAcceptsAccumulator ()
     "An instance of C{L{AnyAcceptsAccumulator}}."
 
@@ -330,7 +336,7 @@ class AbstractSignal (object):
     "An instance of C{L{ValueListAccumulator}}."
 
 
-    def has_handlers (self):
+    cpdef int has_handlers (self):
         """
         Determine if the signal has any handlers or if it is not known.  Note that return
         value of C{True} indicates that there I{might} be handlers.  Return value of
@@ -361,7 +367,7 @@ class AbstractSignal (object):
         del __nonzero__
 
 
-    def count_handlers (self):
+    cpdef int count_handlers (self):
         """
         Get the full number of handlers connected to this signal.  This method might be
         (comparatively) slow.  Unless you really need an exact number, consider using
@@ -457,7 +463,7 @@ class AbstractSignal (object):
         return WeakBinding.wrap (handler, arguments, None, keywords)
 
 
-    def do_connect (self, handler):
+    cdef do_connect (self, handler):
         """
         Connect C{handler} to the signal without any further modifications.  See
         C{L{connect}} method for details.
@@ -470,7 +476,7 @@ class AbstractSignal (object):
 
         raise_not_implemented_exception (self)
 
-    def do_connect_safe (self, handler):
+    cdef int do_connect_safe (self, handler):
         """
         Connect C{handler} to the signal unless it is connected already, without any
         further modifications.  See C{L{connect}} method for details.
@@ -575,23 +581,6 @@ class AbstractSignal (object):
         raise_not_implemented_exception (self)
 
 
-    if 'contextlib' in globals ():
-        # This is a collection of gross hacks aimed at making this work (obviously) _and_
-        # tricking Epydoc into not noticing that we import stuff from a different module.
-
-        from notify._2_5 import signal as _2_5
-
-        connecting                   = _2_5.connecting
-        connecting_safely            = _2_5.connecting_safely
-        blocking                     = _2_5.blocking
-
-        # This is needed so that Epydoc sees docstrings as UTF-8 encoded.
-        connecting.__module__        = __module__
-        connecting_safely.__module__ = __module__
-        blocking.__module__          = __module__
-
-        del _2_5
-
 
     def emit (self, *arguments, **keywords):
         """
@@ -625,7 +614,7 @@ class AbstractSignal (object):
         return self.emit (*arguments, **keywords)
 
 
-    def _get_emission_level (self):
+    cdef int _get_emission_level (self):
         """
         Internal getter for the C{L{emission_level}} property.  Outside code should use
         that property, not the method directly.
@@ -635,7 +624,7 @@ class AbstractSignal (object):
 
         raise_not_implemented_exception (self)
 
-    def _is_emission_stopped (self):
+    cdef int _is_emission_stopped (self):
         """
         Internal getter for the C{L{emission_stopped}} property.  Outside code should use
         that property, not the method directly.
@@ -645,7 +634,7 @@ class AbstractSignal (object):
 
         raise_not_implemented_exception (self)
 
-    def stop_emission (self):
+    cpdef int stop_emission (self):
         """
         Stop the current emission of the signal.  If there is no emission in progress to
         begin with or if the current emission is already stopped with a call to this
@@ -666,7 +655,7 @@ class AbstractSignal (object):
         raise_not_implemented_exception (self)
 
 
-    def collect_garbage (self):
+    cpdef collect_garbage (self):
         """
         Make the signal disconnect all handlers of garbage-collected objects.  Signal is
         not required to do anything, this method is merely a ‘request’ to remove garbage.
@@ -732,24 +721,24 @@ class AbstractSignal (object):
                 sys.excepthook (*sys.exc_info ())
 
 
-    default_exception_handler.__doc__ = \
-    ("""
-     Default handler for exceptions occured in signal handlers.  If C{exception} is not
-     C{SystemExit} or C{KeyboardInterrupt}, it is printed to C{sys.stderr} or, more
-     exactly, passed to C{sys.excepthook}.  Otherwise it is reraised and so thrown out of
-     signal emission.  This is most often what you want: errors in handlers won’t break
-     unsuspecting signal emissions, while non-errors (C{SystemExit} and
-     C{KeyboardInterrupt}) will be propagated further.
-
-     On Python 2.5 C{default_exception_handler} is defined a little differently.
-     Specifically, instances of C{Exception} class will be passed to C{sys.excepthook} and
-     all other exceptions will be reraised.  For standard exceptions this is exactly the
-     same as described above.  There may be differences for custom exception types only,
-     but then you probably derived from C{BaseException} specifically for exception not to
-     be caught by default.
-
-     @see:  exception_handler
-     """)
+#    default_exception_handler.__doc__ = \
+#    ("""
+#     Default handler for exceptions occured in signal handlers.  If C{exception} is not
+#     C{SystemExit} or C{KeyboardInterrupt}, it is printed to C{sys.stderr} or, more
+#     exactly, passed to C{sys.excepthook}.  Otherwise it is reraised and so thrown out of
+#     signal emission.  This is most often what you want: errors in handlers won’t break
+#     unsuspecting signal emissions, while non-errors (C{SystemExit} and
+#     C{KeyboardInterrupt}) will be propagated further.
+#
+#     On Python 2.5 C{default_exception_handler} is defined a little differently.
+#     Specifically, instances of C{Exception} class will be passed to C{sys.excepthook} and
+#     all other exceptions will be reraised.  For standard exceptions this is exactly the
+#     same as described above.  There may be differences for custom exception types only,
+#     but then you probably derived from C{BaseException} specifically for exception not to
+#     be caught by default.
+#
+#     @see:  exception_handler
+#     """)
 
 
     def ignoring_exception_handler (signal, exception, handler):
@@ -835,7 +824,7 @@ class AbstractSignal (object):
     """
 
 
-    def _additional_description (self, formatter):
+    cpdef object _additional_description (self, formatter):
         """
         Generate list of additional descriptions for this object.  All description strings
         are put in parentheses after basic signal description and are separated by
@@ -881,7 +870,7 @@ class AbstractSignal (object):
 
         return []
 
-    def __to_string (self, strict):
+    cpdef str __to_string (self, strict):
         if strict:
             additional_description = self._additional_description (repr)
         else:
@@ -903,11 +892,20 @@ class AbstractSignal (object):
     def __str__(self):
         return '<%s at 0x%x%s>' % (self.__class__.__name__, id (self), self.__to_string (True))
 
+#AbstractSignal.AbstractAccumulator = AbstractAccumulator
+#AbstractSignal.AnyAcceptsAccumulator = AnyAcceptsAccumulator
+#AbstractSignal.AllAcceptAccumulator = AllAcceptAccumulator
+#AbstractSignal.LastValueAccumulator = LastValueAccumulator
+#AbstractSignal.ValueListAccumulator = ValueListAccumulator
+#AbstractSignal.ANY_ACCEPTS = AnyAcceptsAccumulator()
+#AbstractSignal.ALL_ACCEPT = AllAcceptAccumulator()
+#AbstractSignal.LAST_VALUE = LastValueAccumulator()
+#AbstractSignal.VALUE_LIST = ValueListAccumulator()
 
 
 #-- Standard signal classes ------------------------------------------
 
-class Signal (AbstractSignal):
+cdef class Signal (AbstractSignal):
 
     """
     Standard implementation of C{L{AbstractSignal}} interface.
@@ -921,7 +919,6 @@ class Signal (AbstractSignal):
     """
 
     __slots__ = ('_handlers', '_blocked_handlers', '__accumulator', '__emission_level')
-
 
     def __init__(self, accumulator = None):
         """
@@ -957,7 +954,7 @@ class Signal (AbstractSignal):
                             """))
 
 
-    def has_handlers (self):
+    cpdef int has_handlers (self):
         if self._handlers is None:
             return False
 
@@ -967,7 +964,7 @@ class Signal (AbstractSignal):
 
         return False
 
-    def count_handlers (self):
+    cpdef int count_handlers (self):
         num_handlers = 0
 
         if self._handlers is not None:
@@ -1000,7 +997,7 @@ class Signal (AbstractSignal):
             return False
 
 
-    def do_connect (self, handler):
+    cdef do_connect (self, handler):
         if self._handlers is not None:
             self._handlers.append (handler)
         else:
@@ -1191,13 +1188,13 @@ class Signal (AbstractSignal):
             return accumulator.post_process_value (value)
 
 
-    def _get_emission_level (self):
+    cdef int _get_emission_level (self):
         return abs (self.__emission_level)
 
-    def _is_emission_stopped (self):
+    cdef int _is_emission_stopped (self):
         return self.__emission_level < 0
 
-    def stop_emission (self):
+    cpdef int stop_emission (self):
         # Check if we are in emission at all or if emission is not stopped already.
         if self.__emission_level > 0:
             self.__emission_level = -self.__emission_level
@@ -1206,7 +1203,7 @@ class Signal (AbstractSignal):
             return False
 
 
-    def collect_garbage (self):
+    cpdef collect_garbage (self):
         # NOTE: If, for some reason, you change this, don't forget to adjust
         #       `CleanSignal.collect_garbage' accordingly.
 
@@ -1219,7 +1216,7 @@ class Signal (AbstractSignal):
                               or None)
 
 
-    def _additional_description (self, formatter):
+    cpdef object _additional_description (self, formatter):
         if self.__accumulator is not None:
             descriptions = ['accumulator: %s' % formatter (self.__accumulator)]
         else:
@@ -1234,7 +1231,7 @@ class Signal (AbstractSignal):
 # Implementation note: `__parent' is always a reference (either a weak one or
 # `_NONE_REFERENCE') and never changes once the signal is created.
 
-class CleanSignal (Signal):
+cdef class CleanSignal (Signal):
 
     """
     Subclass of C{L{Signal}} which wraps its handlers in such a way that garbage-collected
@@ -1285,7 +1282,7 @@ class CleanSignal (Signal):
             AbstractGCProtector.default.unprotect (self)
 
 
-    def do_connect (self, handler):
+    cdef do_connect (self, handler):
         parent = self.__parent ()
         if self._handlers is None and parent is not None:
             AbstractGCProtector.default.protect (self)
@@ -1330,7 +1327,7 @@ class CleanSignal (Signal):
         self.collect_garbage ()
 
 
-    def collect_garbage (self):
+    cpdef collect_garbage (self):
         if self._handlers is not None and self._get_emission_level () == 0:
             # NOTE: This is essentially inlined method of the superclass.  While calling
             #       that method would be more proper, inlining it gives significant speed
@@ -1348,7 +1345,7 @@ class CleanSignal (Signal):
                     AbstractGCProtector.default.unprotect (self)
 
 
-    def _additional_description (self, formatter):
+    cpdef object _additional_description (self, formatter):
         parent = self.__parent ()
         if parent is not None:
             descriptions = ['parent: %s' % formatter (parent)]

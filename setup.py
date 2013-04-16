@@ -145,7 +145,8 @@ classifiers = ['Topic :: Software Development :: Libraries :: Python Modules',
 
 
 from distutils.core              import setup, Extension
-from distutils.command.build_ext import build_ext as _build_ext
+#from distutils.command.build_ext import build_ext as _build_ext
+from Cython.Distutils import build_ext as _build_ext
 
 import distutils.util
 
@@ -214,7 +215,17 @@ distutils.util.byte_compile = custom_byte_compile
 gc_extension = Extension (name    = 'notify._gc',
                           sources = [os.path.join ('notify', '_gc.c')])
 
-
+from functools import partial
+path = partial(os.path.join, 'notify')
+cython_extensions = [
+	Extension(name='notify.signal', sources=[path('signal.pyx')]),
+	Extension(name='notify.base', sources=[path('base.pyx')]),
+	Extension(name='notify.bind', sources=[path('bind.pyx')]),
+	Extension(name='notify.condition', sources=[path('condition.pyx')]),
+	Extension(name='notify.mediator', sources=[path('mediator.pyx')]),
+	Extension(name='notify.utils', sources=[path('utils.pyx')]),
+	Extension(name='notify.variable', sources=[path('variable.pyx')])
+]
 
 setup (name             = 'py-notify',
        version          = version,
@@ -227,7 +238,7 @@ setup (name             = 'py-notify',
        license          = "GNU Lesser General Public License v2.1",
        classifiers      = classifiers,
        packages         = ['notify', 'notify._2_5'],
-       ext_modules      = [gc_extension],
+       ext_modules      = [gc_extension] + cython_extensions,
        cmdclass         = { 'build_ext': build_ext })
 
 

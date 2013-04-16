@@ -35,7 +35,8 @@ __all__       = ('AbstractValueObject',)
 import sys
 
 from notify.mediator import AbstractMediator
-from notify.signal   import AbstractSignal, Signal
+#from notify.signal   import AbstractSignal, Signal
+from notify.signal cimport AbstractSignal, Signal
 from notify.utils    import execute, is_callable, is_valid_identifier, mangle_identifier, \
                             raise_not_implemented_exception, StringType
  
@@ -49,7 +50,7 @@ except ImportError:
 
 #-- Base class for conditions and variables --------------------------
 
-class AbstractValueObject (object):
+cdef class AbstractValueObject (object):
 
     """
     Base class for C{L{AbstractCondition <condition.AbstractCondition>}} and
@@ -84,7 +85,7 @@ class AbstractValueObject (object):
     _is_mutable, _value_changed, _create_signal, _has_signal, _remove_signal,
     _additional_description
     """
-
+    
     __slots__ = ('__weakref__', '__signal', '__flags')
 
 
@@ -98,7 +99,6 @@ class AbstractValueObject (object):
     # need to combine with the first.
     #
     # We rely on Python's caching of small integers, otherwise this does waste memory.
-
 
     def __init__(self):
         """
@@ -116,7 +116,7 @@ class AbstractValueObject (object):
         self.__flags  = 0
 
 
-    def get (self):
+    cpdef object get (self):
         """
         Get the current value of the object.  Note that the default implementation just
         raises C{NotImplementedError}, since the current value is not stored by default.
@@ -126,7 +126,7 @@ class AbstractValueObject (object):
 
         raise_not_implemented_exception (self)
 
-    def set (self, value):
+    cpdef int set (self, object value):
         """
         Set the current value to C{value}, if possible.  Default implementation always
         raises C{NotImplementedError} as it is not mutable.
@@ -144,8 +144,7 @@ class AbstractValueObject (object):
 
         raise_not_implemented_exception (self)
 
-
-    def _is_mutable (self):
+    cpdef int _is_mutable (self):
         """
         Determine if object is mutable and thus if C{L{set}} method can be called at all.
         Default implementation assumes that if derived class overrides C{set} method, its
@@ -157,36 +156,39 @@ class AbstractValueObject (object):
         @rtype: C{bool}
         """
 
-        return self.set.im_func is not AbstractValueObject.set.im_func
+        return self.set is not AbstractValueObject.set
+#        return self.set.im_func is not AbstractValueObject.set.im_func
 
-    if sys.version_info[0] >= 3:
-        def temp (self):
-            return self.set.__func__ is not AbstractValueObject.set
-
-        temp.__doc__ = _is_mutable.__doc__
-        _is_mutable  = temp
-        del temp
-
-
-    mutable = property (lambda self: self._is_mutable (),
-                        doc = ("""
-                               Read-only property indicating if this object is mutable.
-                               In other words, if object’s value can be changed by
-                               C{L{set}} method, or if it is computed by some means and
-                               not settable from outside.
-
-                               @type: bool
-                               """))
+    #if sys.version_info[0] >= 3:
+    #    def temp (self):
+    #        return self.set.__func__ is not AbstractValueObject.set
+    #
+    #    temp.__doc__ = _is_mutable.__doc__
+    #    _is_mutable  = temp
+    #    del temp
 
 
-    def __get_changed_signal (self):
+    property mutable:
+        '''
+        Read-only property indicating if this object is mutable.
+        In other words, if object's value can be changed by
+        C{L{set}} method, or if it is computed by some means and
+        not settable from outside.
+        
+        @type: bool
+        '''
+        def __get__(self):
+            return self._is_mutable()
+
+    cdef Signal __get_changed_signal (self):
         flags = self.__flags
         if flags & 3:
             if flags & 1:
                 return self.__signal
             else:
                 return self.__signal ()
-
+        
+        cdef Signal signal
         signal, self.__signal = self._create_signal ()
         if self.__signal is signal:
             self.__flags += 1
@@ -196,7 +198,7 @@ class AbstractValueObject (object):
         return signal
 
 
-    def _create_signal (self):
+    cdef tuple _create_signal (self):
         """
         Create the signal that will be returned by C{L{changed}} property.  Default
         implementation returns an instance of C{L{Signal <signal.Signal>}} class without
@@ -215,7 +217,7 @@ class AbstractValueObject (object):
         @rtype:   C{L{AbstractSignal}}, C{object}
         @returns: See method description for details.
         """
-
+        cdef Signal signal
         signal = Signal ()
         return signal, signal
 
@@ -541,24 +543,6 @@ class AbstractValueObject (object):
             return False
  
  
-    if 'contextlib' in globals ():
-        from notify._2_5 import base as _2_5
-
-        storing                         = _2_5.storing
-        storing_safely                  = _2_5.storing_safely
-        synchronizing                   = _2_5.synchronizing
-        synchronizing_safely            = _2_5.synchronizing_safely
-        changes_frozen                  = _2_5.changes_frozen
-
-        # This is needed so that Epydoc sees docstrings as UTF-8 encoded.
-        storing.__module__              = __module__
-        storing_safely.__module__       = __module__
-        synchronizing.__module__        = __module__
-        synchronizing_safely.__module__ = __module__
-        changes_frozen.__module__       = __module__
-
-        del _2_5
-
 
     def _value_changed (self, new_value):
         """
@@ -640,7 +624,6 @@ class AbstractValueObject (object):
         @returns: Whatever C{callback} returns, unchanged. 
         """
 
-        # Note: keep in sync with changes_frozen() in `notify/_2_5/base.py'.
 
         if self.__flags >= 0:
             original_value  = self.get ()
@@ -657,21 +640,22 @@ class AbstractValueObject (object):
         else:
             return callback (*arguments, **keywords)
 
-
-    changed = property (__get_changed_signal,
-                        doc = ("""
-                        The ‘changed’ signal for this object.  ‘Changed’ signal is emitted
-                        if and only if the current value is changed and the object is not
-                        L{frozen <is_frozen>}.  User of the object must never emit the
-                        signal herself, but may operate with its handlers.
-                        
-                        Internally, reading this property creates the signal if it hasn’t
-                        been created yet.  Derived classes may assume this behaviour.
-
-                        @type: C{L{AbstractSignal}}
-                        """))
-
-
+    
+    property changed:
+        '''
+        The ‘changed’ signal for this object.  ‘Changed’ signal is emitted
+        if and only if the current value is changed and the object is not
+        L{frozen <is_frozen>}.  User of the object must never emit the
+        signal herself, but may operate with its handlers.
+        
+        Internally, reading this property creates the signal if it hasn’t
+        been created yet.  Derived classes may assume this behaviour.
+        
+        @type: C{L{AbstractSignal}}
+        '''
+        def __get__(self):
+            return self.__get_changed_signal()
+    
 
     def _additional_description (self, formatter):
         """
