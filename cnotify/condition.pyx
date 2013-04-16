@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2006, 2007, 2008 Paul Pogonyshev.                    #
 #                                                                    #
@@ -720,7 +720,7 @@ class _True (AbstractCondition):
     def __repr__(self):
         # If you hack and use a different instance, it will not be proper.  But you
         # shouldn't anyway.
-        return 'notify.condition.AbstractCondition.TRUE'
+        return 'cnotify.condition.AbstractCondition.TRUE'
 
     def __str__(self):
         return 'Condition.TRUE'
@@ -772,7 +772,7 @@ class _False (AbstractCondition):
     def __repr__(self):
         # If you hack and use a different instance, it will not be proper.  But you
         # shouldn't anyway.
-        return 'notify.condition.AbstractCondition.FALSE'
+        return 'cnotify.condition.AbstractCondition.FALSE'
 
     def __str__(self):
         return 'Condition.FALSE'

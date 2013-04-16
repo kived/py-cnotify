@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2006, 2007, 2008 Paul Pogonyshev.                    #
 #                                                                    #
@@ -32,7 +32,7 @@ instance, the main difference from lambdas can be shown with this example:
     ... a != b
     ...
     ... import operator
-    ... from notify.bind import *
+    ... from cnotify.bind import *
     ...
     ... p = Binding (operator.add, 3)
     ... q = Binding (operator.add, 3)

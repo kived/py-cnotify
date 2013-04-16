@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2006, 2007, 2008 Paul Pogonyshev.                    #
 #                                                                    #
@@ -29,7 +29,7 @@ of some event.
 
 Here is an unrealistic example of usage:
 
-    >>> from notify.signal import *
+    >>> from cnotify.signal import *
     ... import sys
     ...
     ... night = Signal ()
@@ -79,20 +79,20 @@ Brief Comparison With GObject Signals
     not be more efficient for your particular case and which implementation to use is of
     course your choice.  Here is a brief list of major differences.
 
-      - Py-notify signals are objects.  Therefore, they are not bound to class contexts
+      - Py-cnotify signals are objects.  Therefore, they are not bound to class contexts
         and can be passed around, created locally and so on.
 
-      - There is no default handler for a class in Py-notify.  Since signals are not bound
+      - There is no default handler for a class in Py-cnotify.  Since signals are not bound
         to classes, this is even impossible.
 
-      - Py-notify signal handlers are not type-safe.  This is a result of native Pythonic
+      - Py-cnotify signal handlers are not type-safe.  This is a result of native Pythonic
         implementation.  (PyGObject wraps C signals from U{GLib <http://gtk.org/>}.)
 
       - There are no connection IDs, handlers can be disconnected only by passing the same
         handler to C{L{disconnect <AbstractSignal.disconnect>}} method.  This is less
         efficient, but easier to use.
 
-      - Py-notify signals are U{slower <http://home.gna.org/py-notify/benchmark.html>}.
+      - Py-cnotify signals are U{slower <http://home.gna.org/py-notify/benchmark.html>}.
         This may be important in time-critical code if you use signals heavily.
 
     In general, you should use whatever suits your needs better.  GObject signals are
@@ -1236,7 +1236,7 @@ cdef class CleanSignal (Signal):
     """
     Subclass of C{L{Signal}} which wraps its handlers in such a way that garbage-collected
     ones are detected instantly.  Clean signals also have a notion of I{parent}, which
-    they L{prevent from being garbage-collected <notify.gc>}, but only if there is at
+    they L{prevent from being garbage-collected <cnotify.gc>}, but only if there is at
     least one handler.
 
     Also, unlike plain C{Signal}, C{CleanSignal} allows to weakly reference itself.

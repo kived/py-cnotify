@@ -157,7 +157,7 @@ class _AsString (object):
         raise TypeError ("'as_string' attributes cannot be deleted")
 
     def __repr__(self):
-        return 'notify.utils.as_string'
+        return 'cnotify.utils.as_string'
 
 
 as_string = _AsString ()
@@ -178,7 +178,7 @@ def raise_not_implemented_exception (object = None, function_name = None):
          Foo ().bar ()
        File ".../foo.py", line #, in bar
          raise_not_implemented_exception (self)
-       File ".../notify/utils.py", line #, in raise_not_implemented_exception
+       File ".../cnotify/utils.py", line #, in raise_not_implemented_exception
          raise exception
      NotImplementedError: bar() not implemented in class Foo (declared in AbstractFoo)
 
@@ -250,7 +250,7 @@ def _find_declaration_classes (_class, function_name):
 if sys.version_info[0] >= 3:
     execute = eval ('exec')
 else:
-    from notify._2_x import execute
+    from cnotify._2_x import execute
 
 
 

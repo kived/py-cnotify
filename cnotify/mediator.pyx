@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2006, 2007, 2008 Paul Pogonyshev.                    #
 #                                                                    #
@@ -37,7 +37,7 @@ need transformation to depend on a parameter:
     ... f1 != f2
     ...
     ... import operator
-    ... from notify.mediator import *
+    ... from cnotify.mediator import *
     ... identity = lambda x: x
     ... m1 = FunctionalMediator (operator.add, operator.sub, 10)
     ... m2 = FunctionalMediator (operator.add, operator.sub, 10)

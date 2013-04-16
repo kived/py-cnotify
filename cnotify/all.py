@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2007, 2008 Paul Pogonyshev.                          #
 #                                                                    #
@@ -25,7 +25,7 @@
 """
 An utility module that can be used to conveniently import all package classes at once.  It
 would look like this:
-    >>> from notify.all import *
+    >>> from cnotify.all import *
 
 Whether to use this feature is up to you.
 """

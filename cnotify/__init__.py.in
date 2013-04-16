@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2007, 2008 Paul Pogonyshev.                          #
 #                                                                    #
@@ -23,7 +23,7 @@
 
 
 """
-Notify package provides three main concepts: I{L{signals <signal>}}, I{L{conditions
+cNotify package provides three main concepts: I{L{signals <signal>}}, I{L{conditions
 <condition>}} and I{L{variables <variable>}}.  Signals are basically lists of callables
 that can be I{emitted} and then will call all contained callables (I{handler} of a signal)
 in turn.  Conditions are boolean values complemented with a signal that is emitted when
@@ -38,7 +38,7 @@ derived variable classes can restrict the set of allowed values.)
 
 Here is a quick example:
 
-    >>> from notify.variable import *
+    >>> from cnotify.variable import *
     ... name = Variable ()
     ...
     ... import sys
@@ -54,7 +54,7 @@ themselves and are informed upon a change automatically.
 Here is a little more elaborate example with the same functionality (it requires U{PyGTK
 <http://pygtk.org/>}):
 
-    >>> from notify.variable import *
+    >>> from cnotify.variable import *
     ... import gtk
     ...
     ... name = Variable ()
@@ -92,7 +92,7 @@ actually changes, not on every assignment.
 
 Now a final, quite complicated, example introducing conditions and some other features:
 
-    >>> from notify.all import *
+    >>> from cnotify.all import *
     ...
     ... pilots = Variable ()
     ... fuel   = Variable ()
@@ -173,12 +173,12 @@ __docformat__ = 'epytext en'
 
 __version__   = '%(version_string)s'
 """
-Version of Py-notify, as a string.
+Version of Py-cnotify, as a string.
 """
 
 version_tuple = %(version)s
 """
-Version of Py-notify, as a tuple of integers.  It is guaranteed that version tuples of
+Version of Py-cnotify, as a tuple of integers.  It is guaranteed that version tuples of
 later versions will compare greater that those of earlier versions.
 """
 

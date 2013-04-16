@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #--------------------------------------------------------------------#
-# This file is part of Py-notify.                                    #
+# This file is part of Py-cnotify.                                   #
 #                                                                    #
 # Copyright (C) 2007, 2008 Paul Pogonyshev.                          #
 #                                                                    #
@@ -33,10 +33,10 @@ This module defines both a simple L{interface <AbstractGCProtector>} and several
 implementations, some, which are suitable for production use (C{L{FastGCProtector}}), some
 for debugging purposes (C{L{RaisingGCProtector}}, C{L{DebugGCProtector}}.)
 
-Py-notify classes use value of the C{AbstractGCProtector.default} variable as the
+Py-cnotify classes use value of the C{AbstractGCProtector.default} variable as the
 protector instance.  In case you run into a problem, set it to an instance of
 C{DebugGCProtector} or a similar class to track the problem down (somewhere near your
-program beginning).  However, we believe that Py-notify classes must not cause problems
+program beginning).  However, we believe that Py-cnotify classes must not cause problems
 themselves, they may pop up only if you use a garbage-collection protector yourself.
 """
 
@@ -230,7 +230,7 @@ class UnprotectionError (ValueError):
 
 
 if _PYTHON_IMPLEMENTATION == 'CPython':
-    from notify._gc import DebugGCProtector, FastGCProtector, RaisingGCProtector
+    from cnotify._gc import DebugGCProtector, FastGCProtector, RaisingGCProtector
 
     StandardGCProtector       = FastGCProtector
     HAVE_FAST_IMPLEMENTATIONS = True

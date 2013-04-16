@@ -1,3 +1,15 @@
+py-cnotify (0.3.2~raring1) raring; urgency=low
+
+  * build py-cnotify for raring
+
+ -- Ryan Pessa <ryan@essential-elements.net>  Tue, 16 Apr 2013 14:27:33 -0500
+
+py-cnotify (0.3.2~precise1) precise; urgency=low
+
+  * build py-cnotify for precise
+
+ -- Ryan Pessa <ryan@essential-elements.net>  Tue, 16 Apr 2013 14:27:23 -0500
+
 py-cnotify (0.3.2) raring; urgency=low
 
   * prepare for debian packaging
