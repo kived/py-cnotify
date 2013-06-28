@@ -59,16 +59,16 @@ cdef class AbstractVariable (AbstractValueObject):
 
     __slots__ = ()
 
-    property value:
-        """
-        The current value of the variable.  This property is
-        writable, but setting it for immutable variables will raise
-        C{NotImplementedError}.
-
-        @type: object
-        """
-        def __get__(self): return self.get()
-        def __set__(self, value): self.set(value)
+#    property value:
+#        """
+#        The current value of the variable.  This property is
+#        writable, but setting it for immutable variables will raise
+#        C{NotImplementedError}.
+#
+#        @type: object
+#        """
+#        def __get__(self): return self.get()
+#        #def __set__(self, value): self.set(value)
 
     cpdef AbstractCondition predicate (self, object predicate):
         """
@@ -155,7 +155,7 @@ cdef class AbstractValueTrackingVariable (AbstractVariable):
 
         return self.__value
 
-    cpdef int _set (self, object value):
+    cpdef int _set (self, object value) except? -1:
         """
         Set the value of the variable internally.  The C{value} is checked for both
         equality with the current value and whether it passes C{L{is_allowed_value}} test.
@@ -324,7 +324,7 @@ cdef class AbstractValueTrackingVariable (AbstractVariable):
 
 #-- Standard non-abstract variables ----------------------------------
 
-cdef class Variable (AbstractValueTrackingVariable):
+cdef class _Variable (AbstractValueTrackingVariable):
 
     """
     Standard implementation of a mutable variable.  It is an all-purpose class suitable
@@ -338,7 +338,7 @@ cdef class Variable (AbstractValueTrackingVariable):
     __slots__ = ()
 
 
-    cpdef int set (self, object value):
+    cpdef int set (self, object value) except? -1:
         """
         Set the current value for the variable.  As a result, ‘changed’ signal will be
         emitted, but only if the new value is not equal to the old one.  For derived types
@@ -357,7 +357,13 @@ cdef class Variable (AbstractValueTrackingVariable):
 
         return self._set (value)
 
-
+class Variable(_Variable):
+    @property
+    def value(self):
+        return self.get()
+    @value.setter
+    def value(self, value):
+        self.set(value)
 
 class WatcherVariable (AbstractValueTrackingVariable):
 

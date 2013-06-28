@@ -171,12 +171,12 @@ __docformat__ = 'epytext en'
 
 # CONFIGURATION
 
-__version__   = '0.3.2'
+__version__   = '0.3.2.1'
 """
 Version of Py-cnotify, as a string.
 """
 
-version_tuple = (0, 3, 2)
+version_tuple = (0, 3, 2, 1)
 """
 Version of Py-cnotify, as a tuple of integers.  It is guaranteed that version tuples of
 later versions will compare greater that those of earlier versions.
