@@ -196,6 +196,7 @@ def make_cy_ext(filename):
 	ext = CythonExtension(modname, [srcname])
 	return ext
 
+import fnmatch
 def find_cy_ext(path):
 	ext = []
 	for root, dirnames, filenames in os.walk(path):
