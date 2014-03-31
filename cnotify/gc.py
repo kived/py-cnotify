@@ -229,13 +229,17 @@ class UnprotectionError (ValueError):
     """
 
 
+StandardGCProtector = None
 if _PYTHON_IMPLEMENTATION == 'CPython':
-    from cnotify._gc import DebugGCProtector, FastGCProtector, RaisingGCProtector
+    try:
+        from cnotify._gc import DebugGCProtector, FastGCProtector, RaisingGCProtector
 
-    StandardGCProtector       = FastGCProtector
-    HAVE_FAST_IMPLEMENTATIONS = True
+        StandardGCProtector       = FastGCProtector
+        HAVE_FAST_IMPLEMENTATIONS = True
+    except ImportError:
+        pass
 
-else:
+if not StandardGCProtector:
     StandardGCProtector       = SlowGCProtector
     HAVE_FAST_IMPLEMENTATIONS = False
 

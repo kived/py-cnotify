@@ -38,7 +38,7 @@ import types
 import weakref
 
 #from  cnotify.base      import AbstractValueObject
-from cnotify.base cimport AbstractValueObject
+from cnotify.cnbase cimport AbstractValueObject
 from cnotify.condition import AbstractStateTrackingCondition
 from cnotify.condition cimport AbstractCondition
 from cnotify.gc        import AbstractGCProtector

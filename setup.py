@@ -168,14 +168,14 @@ if platform in ('ios', 'android'):
 else:
 	try:
 		# check for cython
-		from Cython.Distutils import build_ext as _build_ext
+		from Cython.Distutils import build_ext
 		have_cython = True
 	except ImportError:
 		print('\nCython is missing, it is required for compiling aeris2!\n\n')
 		raise
 
 if not have_cython:
-	from distutils.command.build_ext import build_ext as _build_ext
+	from distutils.command.build_ext import build_ext
 
 # copied from kivy
 class CythonExtension(Extension):
@@ -204,46 +204,11 @@ def find_cy_ext(path):
 			ext.append(make_cy_ext(os.path.join(root, filename)))
 	return ext
 
-class build_ext (_build_ext):
-
-	def build_extension (self, extension):
-		_build_ext.build_extension (self, extension)
-
-		if not self.inplace and os.name == 'posix':
-			filename		= self.get_ext_filename (extension.name)
-			link_filename   = filename
-			target_filename = os.path.join (self.build_lib, filename)
-
-			recursion_scan  = os.path.split (filename) [0]
-
-			if hasattr (os, 'symlink'):
-				if (	os.path.islink (link_filename)
-					and os.path.realpath (link_filename) == os.path.abspath (target_filename)):
-					return
-
-			while recursion_scan:
-				recursion_scan  = os.path.split (recursion_scan) [0]
-				target_filename = os.path.join  (os.pardir, target_filename)
-
-			try:
-				os.remove (link_filename)
-			except:
-				# Ignore all errors.
-				pass
-
-			if hasattr (os, 'symlink'):
-				try:
-					os.symlink (target_filename, link_filename)
-				except:
-					# Ignore all errors.
-					pass
-			else:
-				# FIXME: Copy the library then.
-				pass
-
-
+c_extensions = []
+#if 'ANDROID' not in os.environ:
 gc_extension = Extension (name	= 'cnotify._gc',
 						  sources = [os.path.join ('cnotify', '_gc.c')])
+c_extensions.append(gc_extension)
 
 #from functools import partial
 #path = partial(os.path.join, 'cnotify')
@@ -269,7 +234,7 @@ setup (name			 = 'py-cnotify',
 	   license		  = "GNU Lesser General Public License v3",
 	   classifiers	  = classifiers,
 	   packages		 = ['cnotify'],
-	   ext_modules	  = [gc_extension] + cython_extensions,
+	   ext_modules	  = c_extensions + cython_extensions,
 	   cmdclass		 = { 'build_ext': build_ext })
 
 

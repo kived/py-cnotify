@@ -38,7 +38,7 @@ import sys
 import weakref
 
 #from  cnotify.base   import AbstractValueObject
-from cnotify.base cimport AbstractValueObject
+from cnotify.cnbase cimport AbstractValueObject
 from cnotify.gc     import AbstractGCProtector
 #from  cnotify.signal import CleanSignal
 from cnotify.signal cimport CleanSignal

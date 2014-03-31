@@ -1,5 +1,5 @@
 
-from cnotify.base cimport AbstractValueObject
+from cnotify.cnbase cimport AbstractValueObject
 from cnotify.condition cimport AbstractCondition
 
 cdef class AbstractVariable(AbstractValueObject):

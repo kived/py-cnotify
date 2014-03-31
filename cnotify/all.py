@@ -33,7 +33,7 @@ Whether to use this feature is up to you.
 __docformat__ = 'epytext en'
 
 
-from cnotify.base      import *
+from cnotify.cnbase    import *
 from cnotify.bind      import *
 from cnotify.condition import *
 from cnotify.gc        import *
