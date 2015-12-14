@@ -8,7 +8,7 @@ cdef class AbstractValueObject(object):
 	cdef int __flags
 	
 	cpdef object get(AbstractValueObject self)
-	cpdef int set(AbstractValueObject self, object value)
+	cpdef int set(AbstractValueObject self, object value) except? -1
 	cpdef int _is_mutable(AbstractValueObject self)
 	
 	cdef Signal __get_changed_signal(AbstractValueObject self)

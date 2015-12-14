@@ -126,7 +126,7 @@ cdef class AbstractValueObject (object):
 
         raise_not_implemented_exception (self)
 
-    cpdef int set (self, object value):
+    cpdef int set (self, object value) except? -1:
         """
         Set the current value to C{value}, if possible.  Default implementation always
         raises C{NotImplementedError} as it is not mutable.
